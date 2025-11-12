@@ -32,21 +32,9 @@ services:
       POSTGRES_PASSWORD: 2055
       POSTGRES_DB: MovieDB
     ports:
-      - "5432:5432"  # Exposed for backend and optional laptop pgAdmin
+      - "5432:5432"  # Exposed so your laptop pgAdmin can connect
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
 
 volumes:
   pgdata:
