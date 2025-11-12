@@ -9,9 +9,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:2055@db:5432/MovieDB
+      DATABASE_URL: postgresql://postgres:2055@db:5432/MovieDB
     depends_on:
       - db
+    restart: always
 
   frontend:
     build:
@@ -20,6 +21,7 @@ services:
     container_name: movie_frontend
     ports:
       - "5173:5173"
+    restart: always
 
   db:
     image: postgres:17
@@ -30,9 +32,21 @@ services:
       POSTGRES_PASSWORD: 2055
       POSTGRES_DB: MovieDB
     ports:
-      - "5432:5432"
+      - "5432:5432"  # Exposed for backend and optional laptop pgAdmin
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
 
 volumes:
   pgdata:
