@@ -41,7 +41,7 @@ export default function Seat() {
   }, [showtimeId]);
 
   // WebSocket
-  useWebSocket(`ws://localhost:8000/seats/ws/${showtimeId}`, (data) => {
+  useWebSocket(`ws://52.200.176.69:8000/seats/ws/${showtimeId}`, (data) => {
     if (data.type === "update_seats") {
       setSeats((prevSeats) =>
         prevSeats.map((seat) => {

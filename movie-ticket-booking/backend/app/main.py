@@ -8,7 +8,7 @@ app = FastAPI(title="Movie Ticket Booking System")
 Base.metadata.create_all(bind=engine)
 
 origins = [
-    "http://52.200.176.69:5173",
+    "http://52.200.176.69:80",
 ]
 
 app.add_middleware(
