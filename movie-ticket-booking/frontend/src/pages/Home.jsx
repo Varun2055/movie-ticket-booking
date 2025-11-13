@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -34,7 +35,9 @@ const Home = () => {
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
-      setCurrent((prev) => (prev === movies.length - 1 ? 0 : prev + 1));
+      if (movies.length > 0) {
+        setCurrent((prev) => (prev === movies.length - 1 ? 0 : prev + 1));
+      }
     }, 5000);
     return () => clearInterval(interval);
   }, [isPaused, movies]);
@@ -72,79 +75,88 @@ const Home = () => {
   return (
     <div className="mt-5 bg-black text-white min-h-screen overflow-x-hidden">
       {/* ✅ HERO SECTION */}
-      <div
-        className="relative w-full h-[85vh] overflow-hidden"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        <AnimatePresence>
-          <motion.img
-            key={movies[current].id}
-            src={movies[current].image_url}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="absolute top-0 left-0 w-full h-full object-cover"
-          />
-        </AnimatePresence>
+      {movies.length > 0 ? (
+        <div
+          className="relative w-full h-[85vh] overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <AnimatePresence>
+            <motion.img
+              key={movies[current].id}
+              src={movies[current].image_url}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+              className="absolute top-0 left-0 w-full h-full object-cover"
+            />
+          </AnimatePresence>
 
-        {/* ✅ Dark overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent"></div>
 
-        {/* ✅ Hero text */}
-        <div className="absolute left-10 top-3/4 -translate-y-1/2 max-w-xl space-y-4">
-          <h1 className="text-5xl font-bold">{movies[current].title}</h1>
-          <p className="text-lg opacity-80">
-            Book your favourite movie now!
-          </p>
+          <div className="absolute left-10 top-3/4 -translate-y-1/2 max-w-xl space-y-4">
+            <h1 className="text-5xl font-bold">{movies[current].title}</h1>
+            <p className="text-lg opacity-80">Book your favourite movie now!</p>
+
+            <button
+              onClick={() => navigate(`/showtimes/${movies[current].id}`)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg mt-4"
+            >
+              Book Now
+            </button>
+          </div>
 
           <button
-            onClick={() => navigate(`/showtimes/${movies[current].id}`)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg mt-4"
+            onClick={() =>
+              setCurrent((prev) => (prev === 0 ? movies.length - 1 : prev - 1))
+            }
+            className="absolute left-5 top-1/2 -translate-y-1/2 bg-black/40 p-3 rounded-full"
           >
-            Book Now
+            <ChevronLeft size={30} />
+          </button>
+
+          <button
+            onClick={() =>
+              setCurrent((prev) => (prev === movies.length - 1 ? 0 : prev + 1))
+            }
+            className="absolute right-5 top-1/2 -translate-y-1/2 bg-black/40 p-3 rounded-full"
+          >
+            <ChevronRight size={30} />
           </button>
         </div>
-
-        {/* ✅ Arrows */}
-        <button
-          onClick={() =>
-            setCurrent((prev) => (prev === 0 ? movies.length - 1 : prev - 1))
-          }
-          className="absolute left-5 top-1/2 -translate-y-1/2 bg-black/40 p-3 rounded-full"
-        >
-          <ChevronLeft size={30} />
-        </button>
-
-        <button
-          onClick={() =>
-            setCurrent((prev) => (prev === movies.length - 1 ? 0 : prev + 1))
-          }
-          className="absolute right-5 top-1/2 -translate-y-1/2 bg-black/40 p-3 rounded-full"
-        >
-          <ChevronRight size={30} />
-        </button>
-      </div>
+      ) : (
+        <div className="text-center text-white py-20 text-2xl">
+          No movies available
+        </div>
+      )}
 
       {/* Streaming Row */}
       <section className="mt-10 px-6">
         <h2 className="text-2xl font-bold mb-4">Recommended for You</h2>
-        <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
-          {streaming.map((m) => (
-            <MovieCard key={m.id} movie={m} />
-          ))}
-        </div>
+        {streaming.length > 0 ? (
+          <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
+            {streaming.map((m) => (
+              <MovieCard key={m.id} movie={m} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-white opacity-70">No streaming movies available</p>
+        )}
       </section>
 
-      {/* upcomming movies */}
+      {/* Upcoming movies */}
       <section className="mt-10 px-6">
         <h2 className="text-2xl font-bold mb-4">Upcoming Movies</h2>
-        <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
-          {upComming.map((m) => (
-            <UpcommingCard key={m.id} movie={m} />
-          ))}
-        </div>
+        {upComming.length > 0 ? (
+          <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-4">
+            {upComming.map((m) => (
+              <UpcommingCard key={m.id} movie={m} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-white opacity-70">No upcoming movies</p>
+        )}
       </section>
     </div>
   );
