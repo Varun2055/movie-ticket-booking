@@ -19,6 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# app.add.middleware(
+#     TrustedHostMiddleware,
+#     allowed_host=["*", ]
+# )
+
 app.include_router(auth.router)
 app.include_router(movie_routes.router)
 app.include_router(showtime_routes.router)
