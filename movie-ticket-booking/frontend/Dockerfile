@@ -26,7 +26,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # # Stage 1: Builder
 # FROM node:22 AS builder
-
+#
 # WORKDIR /app
 # COPY package.json package-lock.json ./
 # RUN npm install
