@@ -14,10 +14,7 @@ pipeline {
                     echo "Stopping existing containers..."
                     docker compose down || true
                     
-                    echo "Building new images..."
-                    docker compose build --no-cache
-                    
-                    echo "Starting containers..."
+                    echo "Building and Starting containers..."
                     docker compose up -d
                     
                     docker compose ps
