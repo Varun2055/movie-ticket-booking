@@ -1,48 +1,64 @@
 pipeline {
     agent any
 
+    environment {
+        PROJECT_DIR = "/home/ubuntu/movie-ticket-booking/movie-ticket-booking/backend"
+    }
+
     stages {
 
-        stage('Fetch Latest Code in Jenkins') {
+        stage('Pull Latest Code') {
             steps {
-                echo "Pulling latest code into Jenkins workspace..."
+                echo "Pulling latest code from GitHub..."
                 git branch: 'master', url: 'https://github.com/Varun2055/movie-ticket-booking.git'
             }
         }
 
-        stage('Deploy on EC2') {
+        stage('Stop Existing Containers') {
             steps {
-                sh '''
-                echo "---------------------------------------------"
-                echo "UPDATING PROJECT ON EC2 FOR DEPLOYMENT"
-                echo "---------------------------------------------"
-
-                # Move to project directory on EC2
-                cd /home/ubuntu/movie-ticket-booking
-
-                echo "Pulling latest code from GitHub into EC2..."
-                git pull origin master
-
-                echo "Navigating to backend docker-compose folder..."
-                cd movie-ticket-booking/backend
-
-                echo "Stopping existing Docker containers..."
+                echo "Stopping any running Docker containers..."
+                sh """
+                cd ${PROJECT_DIR}
                 docker compose down || true
-
-                echo "Cleaning ALL old Docker images..."
-                docker rmi $(docker images -a -q) || true
-
-                echo "Building new Docker images..."
-                docker compose build
-
-                echo "Starting new updated Docker containers..."
-                docker compose up -d
-
-                echo "---------------------------------------------"
-                echo "DEPLOYMENT SUCCESSFUL!"
-                echo "---------------------------------------------"
-                '''
+                """
             }
+        }
+
+        stage('Clean Docker Images') {
+            steps {
+                echo "Removing all Docker images to force rebuild..."
+                sh """
+                docker rmi \$(docker images -a -q) || true
+                """
+            }
+        }
+
+        stage('Build & Deploy Docker') {
+            steps {
+                echo "Building Docker images..."
+                sh """
+                cd ${PROJECT_DIR}
+                docker compose build --no-cache
+                echo "Starting containers in detached mode..."
+                docker compose up -d
+                """
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                echo "Listing running Docker containers..."
+                sh "docker ps"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment completed successfully!"
+        }
+        failure {
+            echo "Deployment failed. Check console output for errors."
         }
     }
 }
