@@ -13,6 +13,9 @@ pipeline {
                     sh '''
                     echo "Stopping existing containers..."
                     docker compose down || true
+
+                    echo "removing images...."
+                    docker rmi $(docker images -a -q)
                     
                     echo "Building and Starting containers..."
                     docker compose up -d
